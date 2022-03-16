@@ -27,6 +27,7 @@ model Artwork {
   owner_id      Int     @unique
   owner         User    @relation(fields: [owner_id], references: [id])
   title         String  @db.VarChar(100)  @unique
+  description   String?
   display_img   String
   img_1         String?
   img_2         String?
