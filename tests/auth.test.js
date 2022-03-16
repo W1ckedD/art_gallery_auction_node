@@ -46,4 +46,34 @@ describe('POST /auth', () => {
       expect(res.email).toBe(newUser.email);
     });
   });
+
+  describe('/login', () => {
+    test('Required field not provided, should respond with a 500 status code.', async () => {
+      let _user = { email: 'test@test.com', password: '123456' };
+      delete _user.email;
+      const res = await request(app).post('/auth/login/').send(_user);
+      expect(res.statusCode).toBe(500);
+    });
+
+    test('Invalid email, should respond with a 422 status code.', async () => {
+      let _user = { email: 'test1@test.com', password: '123456' };
+      const res = await request(app).post('/auth/login/').send(_user);
+      expect(res.statusCode).toBe(422);
+    });
+
+    test('Invalid password, should respond with a 422 status code.', async () => {
+      let _user = { email: 'test@test.com', password: '1234567' };
+      const res = await request(app).post('/auth/login/').send(_user);
+      expect(res.statusCode).toBe(422);
+    });
+
+    test('Everything is normal, should respond with a 422 status code.', async () => {
+      let _user = { email: 'test@test.com', password: '123456' };
+      const res = await request(app).post('/auth/login/').send(_user);
+      expect(res.body.user.email).toBe(_user.email);
+      expect(res.body.user.password).not.toBe(_user.password);
+      expect(res.body.token).toBeTruthy();
+      expect(res.statusCode).toBe(200);
+    });
+  });
 });

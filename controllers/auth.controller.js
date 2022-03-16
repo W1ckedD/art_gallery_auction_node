@@ -61,7 +61,7 @@ export class AuthController {
       }
 
       const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY);
-      return res.status(201).json({
+      return res.status(200).json({
         user,
         token,
       });
