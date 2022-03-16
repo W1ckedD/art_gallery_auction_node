@@ -77,3 +77,30 @@ describe('POST /auth', () => {
     });
   });
 });
+
+describe('GET /auth', () => {
+  describe('/user/', () => {
+    test('Authorization header not provided, should respond with a 401 status code.', async () => {
+      const res = await request(app).get('/auth/user/');
+      expect(res.status).toBe(401);
+    });
+
+    test('Invalid token provided, should respond with a 401 status code.', async () => {
+      let _user = { email: 'test@test.com', password: '123456' };
+      const post_res = await request(app).post('/auth/login/').send(_user);
+      const res = await request(app)
+        .get('/auth/user/')
+        .set('Authorization', `Bearer ${post_res.body.token}abc`);
+      expect(res.status).toBe(401);
+    });
+
+    test('Everything is normal, should respond with a 200 status code.', async () => {
+      let _user = { email: 'test@test.com', password: '123456' };
+      const post_res = await request(app).post('/auth/login/').send(_user);
+      const res = await request(app)
+        .get('/auth/user/')
+        .set('Authorization', `Bearer ${post_res.body.token}`);
+      expect(res.status).toBe(200);
+    });
+  });
+});

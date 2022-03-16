@@ -10,9 +10,9 @@ export const requireUser = async (req, res, next) => {
   }
 
   const token = authorization.replace('Bearer ', '');
-  const { id } = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
   try {
+    const { id } = jwt.verify(token, process.env.JWT_SECRET_KEY);
     const user = await prisma.user.findUnique({ where: { id } });
     if (!user) {
       return res.status(401).json({ error: 'You must be logged in.' });
@@ -23,6 +23,9 @@ export const requireUser = async (req, res, next) => {
     next();
   } catch (err) {
     console.log(err);
+    if (err instanceof jwt.JsonWebTokenError) {
+      return res.status(401).json({ error: 'You must be logged in.' });
+    }
     return res.status(err.status || 500).json({ error: err.message });
   }
 };
