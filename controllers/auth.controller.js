@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import client from '@prisma/client';
+const { PrismaClientValidationError } = client.Prisma;
 
 const prisma = new client.PrismaClient();
 
@@ -41,8 +42,7 @@ export class AuthController {
         token,
       });
     } catch (err) {
-      console.log(err);
-      return res.status(err.status).json({ error: err.message });
+      return res.status(err.status || 500).json({ error: err.message });
     }
   }
 }
