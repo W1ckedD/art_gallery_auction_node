@@ -1,0 +1,67 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int     @id  @default(autoincrement())
+  email         String  @db.VarChar(100)  @unique
+  password      String  @db.VarChar(100)
+  first_name    String  @db.VarChar(100)
+  last_name     String  @db.VarChar(100)
+  display_name  String  @db.VarChar(50)
+  artworks      Artwork[]
+  auctions      Auction[]
+  bids          Bid[]
+}
+
+model Artwork {
+  id            Int     @id  @default(autoincrement())
+  owner_id      Int     @unique
+  owner         User    @relation(fields: [owner_id], references: [id])
+  title         String  @db.VarChar(100)  @unique
+  display_img   String
+  img_1         String?
+  img_2         String?
+  img_3         String?
+  img_4         String?
+  img_5         String?
+  img_6         String?
+  img_7         String?
+  img_8         String?
+  img_9         String?
+  img_10        String?
+  img_11        String?
+  img_12        String?
+  auctions      Auction[]
+}
+
+model Auction {
+  id            Int       @id  @default(autoincrement())
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+  start_time    DateTime
+  end_time      DateTime
+  artwork_id    Int       @unique
+  artwork       Artwork   @relation(fields: [artwork_id], references: [id])
+  owner_id      Int       @unique
+  owner         User      @relation(fields: [owner_id], references: [id])
+  starting_bid  Float
+  bids          Bid[]
+}
+
+model Bid {
+  id            Int       @id  @default(autoincrement())
+  value         Float
+  auction_id    Int       @unique
+  auction       Auction   @relation(fields: [auction_id], references: [id])
+  placer_id     Int       @unique
+  placer        User      @relation(fields: [placer_id], references: [id])
+}
