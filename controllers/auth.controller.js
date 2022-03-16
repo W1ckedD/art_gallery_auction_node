@@ -1,7 +1,6 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import client from '@prisma/client';
-const { PrismaClientValidationError } = client.Prisma;
 
 const prisma = new client.PrismaClient();
 
@@ -44,5 +43,34 @@ export class AuthController {
     } catch (err) {
       return res.status(err.status || 500).json({ error: err.message });
     }
+  }
+
+  async login(req, res) {
+    const { email, password } = req.body;
+    try {
+      const user = await prisma.user.findUnique({ where: { email } });
+
+      if (!user) {
+        return res.status(422).json({ error: 'Invalid credentials.' });
+      }
+
+      const match = await bcrypt.compare(password, user.password);
+
+      if (!match) {
+        return res.status(422).json({ error: 'Invalid credentials.' });
+      }
+
+      const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY);
+      return res.status(201).json({
+        user,
+        token,
+      });
+    } catch (err) {
+      return res.status(err.status || 500).json({ error: err.message });
+    }
+  }
+
+  getUser(req, res) {
+    return res.status(200).json({ user: req.user });
   }
 }
